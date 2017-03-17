@@ -1,0 +1,17 @@
+{
+    "projectName": "SandBox",
+    "username": "fernando.pereira.costa@telefonica.com.training",
+    "id": "40b12050-09b5-11e7-a623-9b1902f45998",
+    "namespace": "",
+    "orgType": "developer",
+    "loginUrl": "https://login.salesforce.com/",
+    "instanceUrl": "https://vivo--TRAINING.cs18.my.salesforce.com",
+    "workspace": "C:\\DATA\\workspaces\\mavensmate",
+    "subscription": [
+        "ApexClass",
+        "ApexComponent",
+        "ApexPage",
+        "ApexTrigger",
+        "StaticResource"
+    ]
+}

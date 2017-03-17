@@ -1,0 +1,20 @@
+<apex:page showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0">
+    <apex:includeLightning />
+    
+    <apex:stylesheet value="{!URLFOR($Resource.SLDS, '/assets/styles/salesforce-lightning-design-system.min.css')}"/>   
+    
+    <body class="slds dFront" style="height: 100%;">
+        <div id="mainContainer" style="position: relative;"/>
+        <script>
+        var prefix = '{!$Site.Prefix}';
+            prefix = prefix.substring(1, prefix.length) + '/';
+            $Lightning.use("c:TESTE_App", function() {
+                $Lightning.createComponent("c:MM_CENTERS_COMP",
+                    {'sitePrefix' : prefix},
+                    "mainContainer",
+                    function() {}                
+                );                          
+            });
+        </script>
+    </body>
+</apex:page>

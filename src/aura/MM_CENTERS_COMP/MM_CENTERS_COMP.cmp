@@ -1,0 +1,179 @@
+<aura:component controller="MV_AddSVAController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<ltng:require scripts="{!$Resource.Jquery3_1}"/>
+    <ltng:require scripts="{!$Resource.CarrinhoLib}"/>
+    
+   	<aura:handler name="init" value="{!this}" action="{!c.ctrlInit}"/>
+    
+    <aura:registerEvent name="evtNavToNext" type="c:EvtNavToNext"/>
+    
+	<aura:attribute name="carrinhoWrapper" type="MV_CarrinhoWrapper" />
+    <aura:attribute name="isDoneRendering" type="Boolean" default="false"/>    
+    <aura:attribute name="svas" type="Map" default="{}"/>    
+    <aura:attribute name="isvas" type="SVAWrapper[]"/>    
+    <aura:attribute name="mapOfertaToUf" type="Map" default="{}"/>    
+    <aura:attribute name="lstOfertasPorUF" type="List"/>    
+    <aura:attribute name="ofertaSelecionada" type="Map"/>
+    <aura:attribute name="svasDaOfertaSelecionada" type="SVAWrapper[]"/>
+    <aura:attribute name="nomeDoPlano" type="String"/>
+    <aura:attribute name="DDD" type="String"/>
+    <aura:attribute name="UF" type="String"/>
+        
+   	<div class="section-header">
+        
+        <div class="wrapperCarrinho">
+        
+            <ui:scrollerWrapper class="scrollerCarrinho">
+                
+                <!-- CARRINHO -->
+                <aura:iteration items="{!v.lstOfertasPorUF}" var="item">
+                    <div class="estrutura slds-grid slds-wrap">
+                        <div class="slds-grid slds-wrap card-car-style">
+                            <div class="slds-size--5-of-5">
+                                <div class="slds-badge slds-text-align--center slds-m-vertical--small">
+                                    {!item.estado}    
+                                </div>
+                            </div>
+                            <aura:iteration items="{!item.ofertas}" var="oferta">
+                                <div class="slds-size--1-of-5 slds-m-vertical-xx-small">
+                                    <div class="slds-badge slds-text-align--center">
+                                        {!oferta.DDD}
+                                    </div>
+                                </div>
+                                <div class="slds-size--1-of-5 slds-m-vertical-xx-small">
+                                    <div class="sld-box-plano-carrinho font-plano-composicao slds-box slds-box--x-small slds-text-align--center slds-m-around--x-small">
+                                        {!oferta.minutos}
+                                    </div>
+                                </div>
+                                <div class="slds-size--1-of-5 slds-m-vertical-xx-small">
+                                    <div class="sld-box-plano-carrinho font-plano-composicao slds-box slds-box--x-small slds-text-align--center slds-m-around--x-small">
+                                        {!oferta.dados}
+                                    </div>
+                                </div>
+                                <div class="slds-size--1-of-5 slds-m-vertical-xx-small">
+                                    <div class="sld-box-plano-carrinho font-plano-composicao slds-box slds-box--x-small slds-text-align--center slds-m-around--x-small">
+                                        Qtd: {!oferta.qtd}
+                                    </div>
+                                </div>
+                                <div class="slds-size--1-of-5 slds-m-vertical-xx-small" >
+                                    <div class="sld-box-plano-carrinho font-plano-composicao slds-box slds-box--x-small slds-text-align--center slds-m-around--x-small">
+                                        <span class="" onclick="{!c.editsva}" data-ofertaID="{!oferta.key}">
+                                            <lightning:icon iconName="utility:settings" size="x-small"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </aura:iteration>
+                        </div>
+                    </div>
+                </aura:iteration>            
+            </ui:scrollerWrapper>
+        </div>
+        
+        
+        <!-- HEAD -->
+        <div style="display:table;width:100%;border-bottom:2px solid rgb(216, 221, 230);padding:10px 10px 0 10px;">
+            <div style="float:left;width:30%;padding-top:1%;">
+                <ui:button aura:id="button" class="slds-button" label="Voltar" press="{!c.navToBack}"/>
+            </div>
+            <div id="imgCar" style="float:left;width:40%;text-align:center;padding-top:2%;font-size:1.25rem;font-weight:300;" onclick="{!c.openShoppingCar}">
+                <lightning:icon iconName="custom:custom93" size="medium"/> <br/>
+                <span class="iconScroll iconDown ative"><lightning:icon iconName="utility:chevrondown" size="x-small"/></span>
+                <span class="iconScroll iconUp"><lightning:icon iconName="utility:chevronup" size="x-small"/></span>
+            </div>
+            <div style="float:right;width:30%;text-align:right;padding-top:1%;">
+                <button id="next" class="slds-button slds-button--brand" disabled="true"  onclick="{!c.navToOfertasSelecionadas}">
+                    Avançar
+                </button>
+            </div>
+        </div>
+        
+        <!--Header-->
+        <div class="slds-text-heading--small slds-text-align--center text-bold">
+            {!v.nomeDoPlano}
+        </div>
+        <div class="slds-p-top--medium slds-grid">
+            <div class="slds-text-title--caps slds-text-align--center slds-size--1-of-2">
+                {!v.UF}
+            </div>
+            <div class="slds-text-title--caps slds-text-align--center slds-size--1-of-2">
+                DDD: {!v.DDD}
+            </div>
+        </div>
+        <!--Header END-->
+    </div>
+    
+    <ui:scrollerWrapper class="scrollerSize">
+        <!--Card Area -->
+        <div class="slds-p-top--small">
+            <aura:iteration items="{!v.svasDaOfertaSelecionada}" var="item">
+                <article class="slds-card">
+                    <div class="slds-card__header slds-grid">
+                        <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                            <div class="slds-media__figure">
+                                <lightning:icon iconName="utility:call" size="x-small"/><br/>
+                            </div>
+                            <div class="slds-media__body">
+                                <h2>
+                                    <a href="javascript:void(0);" class="slds-card__header-link slds-truncate">
+                                        <span class="slds-text-title" style="white-space:normal;">{!item.name}</span>
+                                    </a>
+                                </h2>
+                            </div>
+                        </header>
+                        <div class="slds-no-flex">
+                            <lightning:icon iconName="utility:groups" size="small"/><br/>
+                        </div>
+                    </div>
+                    <div class="slds-card__body">
+                        <aura:iteration items="{!item.atributos}" var="detail">
+                            <div class="slds-grid slds-grid--align-space slds-m-top--xx-small ">
+                                <div class="slds-size--1-of-4">
+                                    <button class="blueItemStyle">{!detail.Produto_Adicional__r.Name}</button>
+                                </div>
+                                <div class="slds-size--1-of-4">
+                                    <button class="slds-button slds-button--neutral slds-p-left--xx-small" style="width:100%;padding-left:.5rem;padding-right:.5rem;">
+                                        R$<ui:outputNumber value="{!detail.Preco__c}" format=".00"/>
+                                    </button>
+                                </div>
+                                <div class="slds-size--1-of-4 slds-text-align--center">
+                                    <!--<span data-myid="{!detail.Produto_Adicional__c}" data-key="dash" onclick="{!c.changeValue}">
+                                            <lightning:icon iconName="utility:dash" size="small"/>
+                                        </span>-->
+                                    <input id="{!detail.Produto_Adicional__c}" data-prodname="{!item.productName}" data-attname="{!detail.Produto_Adicional__r.Name}" data-parentId="{!item.produto.Id}" type="number" class="slds-input slds-m-horizontal--xx-small slds-text-align--center" value="{!detail.qtd}" data-isChanged="false"/>
+                                    <!--<span data-myid="{!detail.Produto_Adicional__c}" data-key="add" onclick="{!c.changeValue}">
+                                            <lightning:icon iconName="utility:add" size="small"/>
+                                        </span>-->
+                                </div>
+                            </div>
+                        </aura:iteration>
+                        <div class="slds-m-horizontal--medium slds-m-top--x-small slds-text-align--center">
+                            <button data-product="{!item.produto.Id}" class="slds-button slds-button--success" onclick="{!c.aplicar}" style="width:100%;padding-left:.5rem;padding-right:.5rem;">
+                                Aplicar
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            </aura:iteration>    
+        </div>
+        <!--Card Area END -->      
+    </ui:scrollerWrapper>
+    
+    <div class="footer">
+        <div class="slds-grid">
+            <div class="slds-size--1-of-2">
+                <div class="slds-p-top--medium slds-text-align--center">Total linha</div>     		
+            </div>
+            <div class="slds-size--1-of-2">
+                <div class="slds-p-top--medium slds-text-align--center text-bold">R${!v.ofertaSelecionada.valorLinha}</div>  
+            </div>
+        </div>
+        <div class="slds-grid">
+            <div class="slds-size--1-of-2">
+                <div class="slds-p-top--medium slds-text-align--center">Total da Oferta</div>     		
+            </div>
+            <div class="slds-size--1-of-2">
+                <div class="slds-p-top--medium slds-text-align--center text-bold">R${!v.ofertaSelecionada.valorTotal}</div>  
+            </div>
+        </div>
+    </div>        
+      
+</aura:component>
